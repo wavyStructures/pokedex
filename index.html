@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Pokedex</title>
+    <style>
+        #pokedex {
+            min-height: 50vh;
+            background-color: #fb6c6c;
+            color: white;
+            display: flex;
+            padding: 24px;
+        }
+
+        .info-container {
+            background-color: #fff;
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            min-height: 100px;
+            margin-top: -40px;
+        }
+    </style>
+
+    <script>
+        let currentPokemon;
+
+        async function loadPokemon() {
+            let url = 'https://pokeapi.co/api/v2/pokemon/charmander';
+            let response = await fetch(url);
+            currentPokemon = await response.json();
+
+            console.log('loaded Pokemon', currentPokemon,);
+            console.log(currentPokemon['name']);
+
+            renderPokemonInfo();
+        }
+
+        function renderPokemonInfo() {
+            document.getElementById('pokemonName').innerHTML = currentPokemon['name'];
+
+            let imageContainer = document.getElementById('image');
+
+
+            let image = currentPokemon['sprites']['front_default'];
+            imageContainer.src = `${image}`;
+        }
+    </script>
+</head>
+
+<body onload="loadPokemon()">
+
+
+    <h1>Pokedex</h1>
+    <div id="pokedex">
+        <h1 id="pokemonName">Name</h1>
+
+    </div>
+
+    <div class="info-container">
+        <div class="image-container">
+            <img id="image" src="" alt="API_image">
+        </div>
+    </div>
+
+
+
+</body>
+
+</html>
