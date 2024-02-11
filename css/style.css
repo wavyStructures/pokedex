@@ -1,0 +1,143 @@
+body {
+  margin: 0;
+  font-family: "Open Sans", sans-serif;
+  box-sizing: border-box;
+}
+
+.d-none {
+  display: none;
+}
+
+.allCards {
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+h1 {
+  text-align: center;
+  font-family: "LMS PokeDex";
+  text-align: center;
+  font-size: 82px;
+  text-transform: uppercase;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  gap: 8px;
+}
+
+.search-field {
+  height: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dotted lightblue;
+}
+
+.letters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.letter {
+  padding: 2px;
+  border-radius: 5px;
+  border: 1px solid lightgray;
+  margin: 2px;
+  padding: 5px;
+  cursor: pointer;
+}
+.smallCardSingle {
+  display: flex;
+  height: 200px;
+  width: 300px;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 16px;
+  color: #fff;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.smallCardSingle .svgContainer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  opacity: 0.5;
+}
+
+.smallLeft {
+  width: 30%;
+}
+
+.typeContainer {
+  border-radius: 10px;
+  padding: 2px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.smallRight {
+  flex: 1;
+  position: relative;
+}
+
+.cardNumber {
+  position: absolute;
+  right: 0px;
+  top: -16px;
+}
+
+.imageSmall {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 999;
+}
+
+.smallCardSingle .svgContainer svg {
+  width: 180px;
+  height: 180px;
+  margin-right: -60px;
+}
+
+img {
+  height: 200px;
+  object-position: right bottom;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loadMoreButton {
+  border-radius: 5px;
+  padding: 8px;
+  margin: 16px;
+  width: 500px;
+  background-color: #a8a878;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+@media only screen and (max-width: 360px) {
+  .imageSmall {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    position: absolute;
+    bottom: 0;
+    z-index: 999;
+  }
+}

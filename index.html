@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="colors.js"></script>
     <script src="script.js"></script>
-    <link rel="stylesheet" href="fonts.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/style.css">
     <title>Pokedex</title>
 
 
@@ -15,55 +16,24 @@
 
 <body onload="init()">
 
-    <h1>Pokedex</h1>
+    <h1>pokedex</h1>
 
-    <div class="smallCard" id="smallCard"></div>
-
-
-
-
-
-    <div class="bigBox">
-        <div id="pokedex">
-            <h1 id="pokemonName">Name</h1>
-            <div id="typeContainer"></div>
-
+    <div class="main-page">
+        <div class="search-bar">
+            <input type="text" class="search-field" id="searchPokemon" oninput="search()" placeholder=" enter letter or name
+            ...">
+            <button id="searchButton" onclick="search()">OK</button>
         </div>
-
-        <div class="info-container">
-            <div class="image-container">
-                <img id="image" src="" alt="API_image">
-            </div>
-
-            <div class="details-header">
-                <div class="singleDetail">About</div>
-                <div class="singleDetail">Base Stats</div>
-                <div class="singleDetail">Evolution</div>
-                <div class="singleDetail">Moves</div>
-            </div>
-
-            <div id="details-container">
-                <table>
-                    <tr>
-                        <td>Species</td>
-                        <td id="species"></td>
-                    </tr>
-                    <tr>
-                        <td>Height</td>
-                        <td id="height"></td>
-                    </tr>
-                    <tr>
-                        <td>Weight</td>
-                        <td id="weight"></td>
-                    </tr>
-                    <tr>
-                        <td>Abilities</td>
-                        <td id="abilities"></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+        <div class="letters" id="letters"></div>
+        <div class="allCards" id="allCards"></div>
+        <footer>
+            <button id="loadMoreButton" onclick="loadMorePokemons()">load more ...</button>
+        </footer>
     </div>
+
+    <div class="single-card-page d-none" id="singleCardPage">Hier sollte man nichts sehen.</div>
+
+
 </body>
 
 </html>
