@@ -65,6 +65,11 @@ h1 {
   cursor: pointer;
 }
 
+h2 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
 .smallCardSingle .svgContainer {
   position: absolute;
   bottom: 0;
@@ -83,6 +88,10 @@ h1 {
   margin-bottom: 8px;
 }
 
+.pokedexAndInfoContainer .typeContainer {
+  width: 25%;
+}
+
 .smallRight {
   flex: 1;
   position: relative;
@@ -91,7 +100,7 @@ h1 {
 .cardNumber {
   position: absolute;
   right: 0px;
-  top: -16px;
+  top: -48px;
 }
 
 .imageSmall {
@@ -109,7 +118,6 @@ h1 {
 }
 
 img {
-  height: 200px;
   object-position: right bottom;
 }
 
@@ -140,4 +148,90 @@ footer {
     bottom: 0;
     z-index: 999;
   }
+}
+
+/*///////////////////////single card style ///////////////////////*/
+
+.bigBox {
+  min-width: 600px;
+  margin-left: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#pokedex {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  min-height: 36vh;
+  width: 56vw;
+  background-color: #fb6c6c;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+#pokemonNameSingle {
+  font-size: 42px;
+}
+
+#typeContainer {
+  padding: 10px;
+  background-color: rgba(251, 108, 108, 0.5);
+}
+
+.info-container {
+  height: 38vh;
+  width: 56vw;
+  background-color: #fff;
+  border: 1px solid lightgray;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  padding: 24px;
+  margin-top: -40px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+}
+
+#image {
+  position: absolute;
+  bottom: 89%;
+  height: 90%;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px 0;
+  font-size: larger;
+  font-weight: bold;
+}
+
+#details-container {
+  display: flex;
+  margin-top: 24px;
+  color: #000;
+  background-color: aqua;
+  min-height: 200px;
+  min-width: 300px;
+  z-index: 990;
+}
+
+.tdGeneratedInfo {
+  width: 200px;
+}
+.singleDetail {
+  font-size: larger;
+  height: 200px;
+  width: 100px;
+  z-index: 999;
 }

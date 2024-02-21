@@ -7,8 +7,8 @@ async function init() {
     await loadPokemons();
     renderCards();
     createLetters();
-
 }
+
 
 //kleinVersion Objekt darin in results: Array mit URL und Name von 20 Stück 0: {name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/'}
 async function loadPokemons() {
@@ -32,36 +32,39 @@ async function getAllDataSinglePokemon(singleUrl) {
 }
 
 
-
 function renderCards() {
     let allCardsContainer = document.getElementById('allCards');
     allCardsContainer.innerHTML = '';
 
     for (let i = 0; i < pokemonData.length; i++) {
         const currentPokemon = pokemonData[i];
-        // Render each card
-        allCardsContainer.innerHTML += generateCardHTML(currentPokemon);
+        let type = currentPokemon['types'][0]['type']['name'];
+
+        allCardsContainer.innerHTML += generateCardHTML(currentPokemon, type);
         if (currentPokemon['types'].length > 1) {
             let type2Container = document.getElementById(`typeContainer2${currentPokemon['name']}`);
             type2Container.innerHTML = `${currentPokemon['types'][1]['type']['name']}`;
             type2Container.classList.add('typeContainer');
             type2Container.style.backgroundColor = getDarkerTypeColor(currentPokemon['types'][0]['type']['name']);
         }
-        colorCard(currentPokemon);
+        let smallCard = document.getElementById(`smallCardSingle${currentPokemon['name']}`);
+        let typeContainer = document.getElementById(`typeContainer${currentPokemon['name']}`)
+        
+        colorElement(smallCard, type);
+        colorTypeBoxes(typeContainer, type);
     }
 }
 
-function colorCard(currentPokemon) {
-    let smallCard = document.getElementById(`smallCardSingle${currentPokemon['name']}`);
-    let typeContainer = document.getElementById(`typeContainer${currentPokemon['name']}`)
-    let type = currentPokemon['types'][0]['type']['name'];
-
-    smallCard.style.backgroundColor = getTypeColor(type);
-    typeContainer.style.backgroundColor = getDarkerTypeColor(type);
-}
+function colorElement(cardElement, type) {
+        cardElement.style.backgroundColor = getTypeColor(type);
+    }
 
 
-function generateCardHTML(currentPokemon) {
+function colorTypeBoxes(typeContainer, type){
+        typeContainer.style.backgroundColor = getDarkerTypeColor(type);
+    }
+
+function generateCardHTML(currentPokemon, type) {
     return `<div id="smallCardSingle${currentPokemon['name']}" class="smallCardSingle" onclick="openSingleCard(${currentPokemon['id']})">
                 <div class="smallLeft">
                     <h2>${currentPokemon['name']}</h2>
@@ -72,8 +75,8 @@ function generateCardHTML(currentPokemon) {
                         <div class="svgContainer"><div class="cardNumber">#${currentPokemon['id']}</div><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 256 256"
                         enable-background="new 0 0 256 256" xml:space="preserve">
                         <metadata> Svg Vector Icons : http://www.onlinewebfonts.com/icon </metadata>
-                        <g><g><path fill="lightblue"
-                                    d="M128,10C62.9,10,10,62.9,10,128c0,65.1,52.9,118,118,118c65.1,0,118-52.9,118-118C246,62.8,193.1,10,128,10z M128,92.7c19.5,0,35.4,15.8,35.4,35.3s-15.8,35.4-35.4,35.4S92.6,147.5,92.6,128S108.5,92.7,128,92.7z M28,135.6h49.4c3.7,24.6,24.9,43.5,50.6,43.5c25.6,0,46.9-18.9,50.6-43.5H228c-3.9,51.8-47.2,92.7-100,92.7C75.2,228.3,31.9,187.4,28,135.6z" />
+                        <g><g><path fill="getDarkerTypeColor(type);" fill-opacity="0.2";
+                            d="M128,10C62.9,10,10,62.9,10,128c0,65.1,52.9,118,118,118c65.1,0,118-52.9,118-118C246,62.8,193.1,10,128,10z M128,92.7c19.5,0,35.4,15.8,35.4,35.3s-15.8,35.4-35.4,35.4S92.6,147.5,92.6,128S108.5,92.7,128,92.7z M28,135.6h49.4c3.7,24.6,24.9,43.5,50.6,43.5c25.6,0,46.9-18.9,50.6-43.5H228c-3.9,51.8-47.2,92.7-100,92.7C75.2,228.3,31.9,187.4,28,135.6z" />
                         </g></g>
                     </svg></div>
                     <img src="${currentPokemon['sprites']['other']['home']['front_shiny']}" class="imageSmall">
@@ -82,19 +85,12 @@ function generateCardHTML(currentPokemon) {
 }
 
 
-function openSingleCard(pokemonId) {
-    let pokemonClicked = pokemonMap.get(pokemonId);
-
-    showSingleCard(pokemonClicked);
-}
-
-
 function getTypeColor(type) {
     return colors[type] || '#CCCCCC';
 }
 
 function getDarkerTypeColor(type) {
-    let color = colors[type] || '#CCCCCC';            //wird aufgerufen mit Info z.B type 'fire'
+    let color = colors[type] || '#CCCCCC';
     let darkerColor = shadeColor(color, -10);
     return darkerColor;
 }
@@ -121,15 +117,14 @@ async function loadMorePokemons() {
 
 
 function search() {
-    let enteredSearch = document.getElementById('searchPokemon').value.toLowerCase();    //grabs the input-value
+    let enteredSearch = document.getElementById('searchPokemon').value.toLowerCase();
     showSearchedFor(enteredSearch);
 }
 
 
 function showSearchedFor(enteredSearch) {
-    const searchResults = pokemonData.filter(pokemon => pokemon.name.toLowerCase().includes(enteredSearch));
-
-    renderSearchResults(searchResults);
+    const searchResults = pokemonData.filter(pokemon => pokemon.name.toLowerCase().startsWith(enteredSearch));
+   renderSearchResults(searchResults);
 }
 
 
@@ -140,7 +135,12 @@ function renderSearchResults(searchResults) {
 
     searchResults.forEach(pokemon => {
         allCardsContainer.innerHTML += generateCardHTML(pokemon);
-        colorCard(pokemon);
+
+        let smallCard = document.getElementById(`smallCardSingle${pokemon['name']}`);
+        let typeContainer = document.getElementById(`typeContainer${pokemon['name']}`)
+        let type = pokemon['types'][0]['type']['name'];
+        colorElement(smallCard, type);
+        colorTypeBoxes(typeContainer, type);
     });
 
 }
@@ -151,31 +151,44 @@ function filterPokemon(letter) {
 }
 
 //////////////////////////////////////// single card ////////////////////////////////////////
-function showSingleCard(pokemonClicked) {
-    const currentSinglePokemon = pokemonClicked;
+
+function openSingleCard(pokemonId) {                                                                                    //Klick auf Karte soll Einzelkarte öffnen
+    const currentSinglePokemon = pokemonMap.get(pokemonId);                                             //dafür erstmal per ID Poki raussuchen
 
     let mainPage = document.querySelector('.main-page');
-    mainPage.classList.add('d-none');
-
+    mainPage.classList.add('d-none');                                                               //mainPage ausblenden
     let singleCardPage = document.getElementById('singleCardPage');
-    singleCardPage.classList.remove('d-none');
+    singleCardPage.classList.remove('d-none');  
+                                                                   //singlePage einblenden
     singleCardPage.innerHTML = generateSingleCard(currentSinglePokemon);
+    styleSingleCard(currentSinglePokemon);
+    }
+
+function closeSingleCard(event) {
+        if (event.target.id === 'bigBox') {                                         //onclick-event-Ziel mit DOM id bigBox, aber nicht die children, deswegen Klick auf Karte effektlos
+         document.getElementById('singleCardPage').classList.add('d-none');
+         document.querySelector('.main-page').classList.remove('d-none');
+     }
 }
 
 
 function generateSingleCard(currentSinglePokemon) {
-    console.log('inside generate SingleCard currentSinglePoki is: ', currentSinglePokemon);
+const type2 = currentSinglePokemon['types'][1]? currentSinglePokemon['types'][1]['type']['name'] : '';
+
     return `
-    <div class="bigBox">
+    <div class="bigBox" id="bigBox" onclick="closeSingleCard(event)">
+    <div class="pokedexAndInfoContainer" id="pokedexAndInfoContainer">
         <div id="pokedex">
-            <h1 id="pokemonName">Name</h1>
-            <div id="typeContainer"></div>
+            <h2 id="pokemonNameSingle">${currentSinglePokemon['name']}</h2>
+            <div id="typeContainerSingle">${currentSinglePokemon['types'][0]['type']['name']}</div>
+            ${  type2 ? `<div id="typeContainer2Single${currentSinglePokemon['name']}">${type2}</div>` : ''  }
+            
 
         </div>
 
-        <div class="info-container">
+        <div class="info-container" id="info-container">
             <div class="image-container">
-                <img id="image" src="" alt="API_image">
+                <img id="image" src="${currentSinglePokemon['sprites']['other']['home']['front_shiny']}" alt="API_image">
             </div>
 
             <div class="details-header">
@@ -206,6 +219,8 @@ function generateSingleCard(currentSinglePokemon) {
                         </tr>
                     </table>
                 </div>
+                
+                
                 <div class="singleDetail" id="baseStatsPage"></div>
                 <div>
                     <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
@@ -251,9 +266,95 @@ function generateSingleCard(currentSinglePokemon) {
 
             </div>
         </div>
+        </div>
     </div>`;
 }
 
+function styleSingleCard(currentSinglePokemon){
+    let bigCardUpperHalf = document.getElementById('pokedex');
+    colorElement(bigCardUpperHalf, currentSinglePokemon['types'][0]['type']['name']);
+
+    typeContainerSingle.classList.add('typeContainer');
+    typeContainerSingle.style.backgroundColor = getDarkerTypeColor(currentSinglePokemon['types'][0]['type']['name']);
+
+    if (currentSinglePokemon['types'].length > 1) {
+        let type2ContainerSingle = document.getElementById(`typeContainer2Single${currentSinglePokemon['name']}`);
+        type2ContainerSingle.classList.add('typeContainer');
+        type2ContainerSingle.style.backgroundColor = getDarkerTypeColor(currentSinglePokemon['types'][0]['type']['name']);
+    }
+
+}
+
+function colorElement(cardElement, type) {
+    cardElement.style.backgroundColor = getTypeColor(type);
+}
+
+
+function colorTypeBoxes(typeContainer, type){
+    typeContainer.style.backgroundColor = getDarkerTypeColor(type);
+}
+
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     renderPokemonInfo();
+// });
+
+// function renderPokemonInfo() {
+//     document.getElementById('pokemonNameSingle').innerHTML = currentPokemon['name'];
+
+//     let type = currentPokemon['types'][0]['type']['name'];
+//     document.getElementById('typeContainer').innerHTML = type;
+
+//     let imageContainer = document.getElementById('image');
+//     let image = currentPokemon['sprites']['front_shiny'];
+//     imageContainer.src = `${image}`;
+
+//     let speciesBox = document.getElementById('species');
+//     speciesBox.innerHTML = generateSpecies();
+
+//     let heightBox = document.getElementById('height');
+//     heightBox.innerHTML = generateHeight();
+
+//     let weightBox = document.getElementById('weight');
+//     weightBox.innerHTML = generateWeight();
+
+//     let abilitiesBox = document.getElementById('abilities');
+//     abilitiesBox.innerHTML = generateAbilities();
+// }
+
+// function generateSpecies() {
+//     return `
+//     <p>Hello ${currentPokemon['types'][0]['type']['name']}</p
+//            `;
+// }
+
+// function generateHeight() {
+//     return `
+//     <p>${currentPokemon['height']}</p
+       
+//     `;
+// }
+
+// function generateWeight() {
+//     const weightInKg = currentPokemon['weight'] / 10;
+//     return `
+//     <p>${weightInKg.toFixed(1)} kg</p>
+//     `;
+// }
+
+// function generateAbilities() {
+//     let abilities = currentPokemon['abilities'];
+//     let result = '';
+
+//     for (let i = 0; i < abilities.length; i++) {
+//         const ability = abilities[i]['ability']['name'];
+//         result += `<p>${ability}</p>`;
+//     }
+
+//     return result
+
+// }
 
 // function sortCards() {
 
@@ -266,4 +367,5 @@ function generateSingleCard(currentSinglePokemon) {
 
 //     renderCards();
 // }
+
 
