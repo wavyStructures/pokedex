@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 
+
+
     <link rel="stylesheet" href="css/fonts.css">
     <link rel="stylesheet" href="css/style.css">
     <title>Pokedex</title>
@@ -16,7 +18,9 @@
 <body onload="init()">
 
     <h1>pokedex</h1>
-
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
     <!-- <div id="loading-spinner"></div> -->
 
     <div class="main-page">
@@ -32,8 +36,10 @@
         </footer>
     </div>
 
-    <div class="single-card-page d-none" id="singleCardPage">Hier sollte man nichts sehen.</div>
+    <div class="single-card-page d-none" id="bigCardPage">Hier sollte man nichts sehen.</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="chart.js"></script>
     <script src="colors.js"></script>
     <script src="script.js"></script>
 </body>

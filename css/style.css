@@ -1,3 +1,7 @@
+* {
+  border: 1px solid red;
+}
+
 body {
   margin: 0;
   font-family: "Open Sans", sans-serif;
@@ -5,6 +9,10 @@ body {
 }
 
 .d-none {
+  display: none;
+}
+
+.d-none-tabs {
   display: none;
 }
 
@@ -100,7 +108,7 @@ h2 {
 .cardNumber {
   position: absolute;
   right: 0px;
-  top: -48px;
+  top: -18px;
 }
 
 .imageSmall {
@@ -137,6 +145,7 @@ footer {
   color: #fff;
   font-size: 16px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 360px) {
@@ -154,11 +163,17 @@ footer {
 
 .bigBox {
   min-width: 600px;
-  margin-left: 32px;
+}
+
+.all {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: row;
+}
+
+.nextPrevArrows {
+  cursor: pointer;
 }
 
 #pokedex {
@@ -183,6 +198,8 @@ footer {
 }
 
 .info-container {
+  display: flex;
+  flex-direction: column;
   height: 38vh;
   width: 56vw;
   background-color: #fff;
@@ -197,7 +214,7 @@ footer {
 
 .image-container {
   display: flex;
-  justify-content: center;
+  justify-content: end;
   align-items: center;
   background-color: transparent;
 }
@@ -216,11 +233,14 @@ footer {
   font-weight: bold;
 }
 
+.tab {
+  cursor: pointer;
+}
+
 #details-container {
   display: flex;
   margin-top: 24px;
   color: #000;
-  background-color: aqua;
   min-height: 200px;
   min-width: 300px;
   z-index: 990;
@@ -229,9 +249,58 @@ footer {
 .tdGeneratedInfo {
   width: 200px;
 }
+
+td {
+  padding-bottom: 3px;
+  padding-right: 8px;
+  width: 32px;
+}
+
+td:last-of-type {
+  font-weight: bold;
+}
+
 .singleDetail {
   font-size: larger;
   height: 200px;
-  width: 100px;
+  width: 600px;
   z-index: 999;
+}
+
+/*/////////////////////// base stats chart ///////////////////////*/
+#myChart {
+  height: 300px;
+  width: 400px;
+  background-color: aqua;
+}
+
+/*/////////////////////// evolution ///////////////////////*/
+.evolutionCircle {
+  border: 1px solid black;
+  border-radius: 50%;
+  height: 132px;
+  width: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.imageEvolution {
+  width: 100px;
+  height: 100px;
+  padding-top: 30px;
+  margin-bottom: 30px;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px;
+}
+
+.evolutionArrows img {
+  width: 50px;
 }

@@ -1,7 +1,14 @@
 let currentPokemon;
+let pokemonsAsJSON;
 let pokemonData = [];
 let pokemonMap = new Map();
 let offset = 0;
+let currentBigPokemon;
+let bigCardJSONforDetails;
+
+let evolutionJSON;
+let statsJSONarray;
+
 
 async function init() {
     await loadPokemons();
@@ -16,19 +23,27 @@ async function loadPokemons() {
     let response = await fetch(url);
     pokemonsAsJSON = await response.json();
 
+    console.log('das ist das pokemonAsJSON', pokemonsAsJSON);
+
     for (let i = 0; i < pokemonsAsJSON['results'].length; i++) {
         const singleUrl = pokemonsAsJSON['results'][i]['url'];
         await getAllDataSinglePokemon(singleUrl);
     }
+    console.log('map is: ', pokemonMap);
+    console.log('pokemonData is:', pokemonData);
+    
+    return pokemonsAsJSON;
 }
-
 
 async function getAllDataSinglePokemon(singleUrl) {
     let url = singleUrl;
     let response = await fetch(url);
+
     currentPokemon = await response.json();
     pokemonMap.set(currentPokemon.id, currentPokemon);
     pokemonData.push(currentPokemon);
+
+    
 }
 
 
@@ -65,7 +80,7 @@ function colorTypeBoxes(typeContainer, type){
     }
 
 function generateCardHTML(currentPokemon, type) {
-    return `<div id="smallCardSingle${currentPokemon['name']}" class="smallCardSingle" onclick="openSingleCard(${currentPokemon['id']})">
+    return `<div id="smallCardSingle${currentPokemon['name']}" class="smallCardSingle" onclick="openBigCard(${currentPokemon['id']})">
                 <div class="smallLeft">
                     <h2>${currentPokemon['name']}</h2>
                     <div class="typeContainer" id="typeContainer${currentPokemon['name']}">${currentPokemon['types'][0]['type']['name']}</div>
@@ -142,7 +157,6 @@ function renderSearchResults(searchResults) {
         colorElement(smallCard, type);
         colorTypeBoxes(typeContainer, type);
     });
-
 }
 
 function filterPokemon(letter) {
@@ -150,139 +164,328 @@ function filterPokemon(letter) {
     showSearchedFor(letter.toLowerCase());
 }
 
+
+
+
+ 
+
 //////////////////////////////////////// single card ////////////////////////////////////////
 
-function openSingleCard(pokemonId) {                                                                                    //Klick auf Karte soll Einzelkarte öffnen
-    const currentSinglePokemon = pokemonMap.get(pokemonId);                                             //dafür erstmal per ID Poki raussuchen
+async function openBigCard(pokemonId) {      
+    let url = `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`; 
+    let response = await fetch(url);
+    bigCardJSONforDetails = await response.json();
+    currentBigPokemon = pokemonMap.get(pokemonId);                                             //dafür erstmal per ID Poki raussuchen
+
+    console.log('currentBig is: ', currentBigPokemon);
 
     let mainPage = document.querySelector('.main-page');
     mainPage.classList.add('d-none');                                                               //mainPage ausblenden
-    let singleCardPage = document.getElementById('singleCardPage');
-    singleCardPage.classList.remove('d-none');  
-                                                                   //singlePage einblenden
-    singleCardPage.innerHTML = generateSingleCard(currentSinglePokemon);
-    styleSingleCard(currentSinglePokemon);
-    }
+    let BigCardPage = document.getElementById('bigCardPage');
+    BigCardPage.classList.remove('d-none');  
+    BigCardPage.innerHTML = generateBigCard(currentBigPokemon);
+    styleBigCard(currentBigPokemon, pokemonId);
+    getEvolutionUrl(currentBigPokemon);
+}
 
-function closeSingleCard(event) {
-        if (event.target.id === 'bigBox') {                                         //onclick-event-Ziel mit DOM id bigBox, aber nicht die children, deswegen Klick auf Karte effektlos
-         document.getElementById('singleCardPage').classList.add('d-none');
+    
+
+
+
+async function getEvolutionUrl(currentBigPokemon){
+    let url = currentBigPokemon['species']['url'];
+    let response = await fetch(url); 
+    let urlEvolutionJSON = await response.json();
+
+    let urlEvolution = urlEvolutionJSON['evolution_chain']['url'];
+    // console.log('urlEvolution is: ', urlEvolution);
+    // console.log('die vorherige URL für evolution is: ', url);
+
+    await getEvolutionDetails(urlEvolution);
+}
+
+
+async function getEvolutionDetails(urlEvolution){
+    let url = urlEvolution;
+    let response = await fetch(urlEvolution);
+    evolutionJSON = await response.json();
+
+    // console.log('evolutionJSON is: ', evolutionJSON);
+
+    showEvolutionDetails(evolutionJSON);
+
+    return evolutionJSON;
+}
+
+
+function showEvolutionDetails(evolutionJSON){
+// console.log('showEvo Versuch zeigt dieses: ', evolutionJSON['chain']['evolves_to'][0]['species']['name']);
+
+if(evolutionJSON['chain']['evolves_to'][0]['species']['name']){
+    document.getElementById('evolutionName2').innerHTML = `${evolutionJSON['chain']['evolves_to'][0]['species']['name']}`;
+    document.getElementById('evolutionName2_2').innerHTML = `${evolutionJSON['chain']['evolves_to'][0]['species']['name']}`;
+    let imgElement2 = document.querySelector("#evolutionCircle2 .imageEvolution");
+    let imgElement2_2 = document.querySelector("#evolutionCircle2Line2 .imageEvolution");
+    
+const currentPokemonId = currentBigPokemon['id'];
+// console.log('Id current: ', currentPokemonId);
+
+const nextPokemonId = currentPokemonId + 1;
+// console.log('Id next is: ', nextPokemonId);
+
+const nextPokemon = pokemonData.find(pokemon => pokemon.id === nextPokemonId);
+// console.log('next Poki is: ', nextPokemon);
+
+if (nextPokemon) {
+    const nextPokemonSprite = nextPokemon['sprites']['other']['home']['front_shiny'];
+    imgElement2.src =`${nextPokemonSprite}`; 
+    imgElement2_2.src =`${nextPokemonSprite}`; 
+//    console.log(nextPokemonSprite);
+} else {
+//   console.log("Next Pokémon not found.");
+}
+   }
+}
+
+function closeBigCard(event) {
+        if (event.target.id === 'bigBox') {         //onclick-event-Ziel mit DOM id bigBox, aber nicht die children, deswegen Klick auf Karte effektlos
+         document.getElementById('bigCardPage').classList.add('d-none');
          document.querySelector('.main-page').classList.remove('d-none');
      }
 }
 
 
-function generateSingleCard(currentSinglePokemon) {
-const type2 = currentSinglePokemon['types'][1]? currentSinglePokemon['types'][1]['type']['name'] : '';
+generateBigCard(currentBigPokemon, evolutionJSON);
+
+function generateBigCard(currentBigPokemon, evolutionJSON) {
+    const type1 = currentBigPokemon['types'][0]['type']['name'];
+    const type2 = currentBigPokemon['types'][1] ? currentBigPokemon['types'][1]['type']['name'] : '';
+    const darkerTypeColor = getDarkerTypeColor(type1);
+
+    console.log('stats is: ', currentBigPokemon['stats']);
+
 
     return `
-    <div class="bigBox" id="bigBox" onclick="closeSingleCard(event)">
-    <div class="pokedexAndInfoContainer" id="pokedexAndInfoContainer">
-        <div id="pokedex">
-            <h2 id="pokemonNameSingle">${currentSinglePokemon['name']}</h2>
-            <div id="typeContainerSingle">${currentSinglePokemon['types'][0]['type']['name']}</div>
-            ${  type2 ? `<div id="typeContainer2Single${currentSinglePokemon['name']}">${type2}</div>` : ''  }
-            
-
-        </div>
-
-        <div class="info-container" id="info-container">
-            <div class="image-container">
-                <img id="image" src="${currentSinglePokemon['sprites']['other']['home']['front_shiny']}" alt="API_image">
+    <div class="bigBox" id="bigBox" onclick="closeBigCard(event)">
+    <div class="all">
+        <div><img src="./img/left-arrow.png" onclick="showPreviousBig(currentBigPokemon)" class="nextPrevArrows"></div>
+        <div class="pokedexAndInfoContainer" id="pokedexAndInfoContainer">
+            <div id="pokedex">
+                <h2 id="pokemonNameSingle">${currentBigPokemon['name']}</h2>
+                <div id="typeContainerSingle">${type1}</div>
+                ${type2 ? `<div id="typeContainer2Single${currentBigPokemon['name']}">${type2}</div>` : '' }
             </div>
 
-            <div class="details-header">
-                <div onclick="showAbout()">About</div>
-                <div onclick="showBaseStats()">Base Stats</div>
-                <div onclick="showEvolution()">Evolution</div>
-                <div onclick="showMoves()">Moves</div>
-            </div>
-
-            <div id="details-container">
-                <div class="singleDetail" id="aboutPage" style="display: none;">
-                    <table>
-                        <tr>
-                            <td>Species</td>
-                            <td class="tdGeneratedInfo" id="species"></td>
-                        </tr>
-                        <tr>
-                            <td>Height</td>
-                            <td class="tdGeneratedInfo" id="height"></td>
-                        </tr>
-                        <tr>
-                            <td>Weight</td>
-                            <td class="tdGeneratedInfo" id="weight"></td>
-                        </tr>
-                        <tr>
-                            <td>Abilities</td>
-                            <td class="tdGeneratedInfo" id="abilities"></td>
-                        </tr>
-                    </table>
-                </div>
-                
-                
-                <div class="singleDetail" id="baseStatsPage"></div>
-                <div>
-                    <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+            <div class="info-container" id="info-container">
+                <div class="image-container">
+                    <img id="image" src="${currentBigPokemon['sprites']['other']['home']['front_shiny']}"
+                        alt="API_image">
                 </div>
 
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
+                <div class="details-header">
+                    <div class="tab" onclick="showTab('aboutPage')">About</div>
+                    <div class="tab" onclick="showTab('baseStatsPage')">Base Stats</div>
+                    <div class="tab" onclick="showTab('evolutionPage')">Evolution</div>
+                    <div class="tab" onclick="showTab('movesPage')">Moves</div>
+                </div>
 
-                    const ctx = document.getElementById('myChart');
-                    const barColors = ["red", "green", "blue", "orange", "brown"];
+                <div id="details-container">
+                    
+                    <div class="singleDetail" id="aboutPage">
+                        <table>
+                            <tr>
+                                <td>Height</td>
+                                <td class="tdGeneratedInfo" id="height">24</td>
+                            </tr>
+                            <tr>
+                                <td>Weight</td>
+                                <td class="tdGeneratedInfo" id="weight">23</td>
+                            </tr>
+                            <tr>
+                                <td>Abilities</td>
+                                <td class="tdGeneratedInfo" id="abilities">12
 
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['HP', 'Attack', 'Defense', 'Sp.Atk', 'Sp.Def', 'Speed', 'Total'],
-                            datasets: [{
-                                data: [5, 10, 15, 20, 25, 30, 35, 90],
-                                borderWidth: 1,
-                                backgroundColor: barColors,
-                            }]
-                        },
-                        options: {
-                            grid: {
-                                display: false
-                            },
-                            indexAxis: 'y',
-                            scales: {
-                                y: {
-                                    grid: {
-                                        display: false
-                                    },
-                                    beginAtZero: true
-                                },
-                            }
-                        }
-                    }
-                    );
+                                </td>
+                            </tr>
+                        </table>
 
-                </script>
+                        <h4>${currentBigPokemon['name']}</h4>
+                        <p class="flavorTexts">${bigCardJSONforDetails['flavor_text_entries'][2]['flavor_text']}</p>
+                        </p>
+                    </div>
 
-                <div class="singleDetail" id="evolutionPage" style="display: none;"></div>
-                <div class="singleDetail" id="movesPage" style="display: none;"></div>
 
+                    <div class="singleDetail d-none-tabs" id="baseStatsPage">
+                        <div>
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="singleDetail d-none-tabs" id="evolutionPage">
+                       
+                            <div class="evolutionLine1 flex" id="evolutionLine1">
+                                <div class="evolutionCircle" id="evolutionCircle1"> <img src="${currentBigPokemon['sprites']['other']['home']['front_shiny']}"
+                                class="imageEvolution">
+                                <p id="evolutionName1">${currentBigPokemon['name']}</p>
+                                </div>
+                                <div class="evolutionArrows">
+                                <img src="./img/arrow-right.png" alt="arrow right">
+                                </div>
+                                
+                                <div class="evolutionCircle" id="evolutionCircle2"><img src=""
+                                class="imageEvolution">
+                                <p id="evolutionName2"></p> 
+                                </div>
+                            </div>
+
+                            <div class="evolutionLine2 flex" id="evolutionLine2">
+                                <div class="evolutionCircle" id="evolutionCircle2Line2"><img src="" class="imageEvolution">
+                                    <p id="evolutionName2_2"></p>
+                                </div>
+                                <div class="evolutionArrows"><img src="./img/arrow-right.png" alt="arrow right"></div>
+                                <div class="evolutionCircle" id="evolutionCircle3"><img src="" class="imageEvolution">
+                                    <p id="evolutionName3"></p>
+                                </div>
+                            </div>
+                    </div>
+
+                    <div class="singleDetail d-none-tabs" id="movesPage">
+                        <p>moves</p>
+                    </div>
+
+                    
+                </div>
             </div>
         </div>
-        </div>
+        <div><img src="./img/right-arrow.png" onclick="showNextBig(currentBigPokemon)" class="nextPrevArrows"></div>
     </div>`;
 }
 
-function styleSingleCard(currentSinglePokemon){
+
+let flavorTexts = document.querySelectorAll('p .flavorTexts');
+for (let p=0;p<flavorTexts.length;p++){
+    let text = flavorTexts[i].text.Content;
+    let newText = text.replace('U+000c', '');
+    flavorTexts[i].textContent = newText;
+}
+
+
+getBaseStats(currentBigPokemon);
+
+
+
+getEvolutionUrl(currentBigPokemon);
+
+
+function showNextBig(currentBigPokemon){
+    let nextBigPokemonID;
+    if(currentBigPokemon['id'] === (pokemonData.length - 1))
+    {  
+        nextBigPokemonID = 1;
+    } else {nextBigPokemonID = currentBigPokemon['id']+1;     
+    }
+    openBigCard(nextBigPokemonID);    
+}
+
+
+function showPreviousBig(currentBigPokemon){
+    let nextBigPokemonID;
+    if(currentBigPokemon['id'] === 1)
+    {  
+    nextBigPokemonID = (pokemonData.length - 1)  ;
+    } else {nextBigPokemonID = currentBigPokemon['id']-1;     
+    }
+    openBigCard(nextBigPokemonID);    
+}
+
+
+///////////////////////////////////////////// About Page /////////////////////////////////////////////
+
+// function calculateDetails(currentBigPokemon){
+//     let calculatedHeight = calculateHeight(currentBigPokemon);
+//     let calculatedWeight = calculateWeight(currentBigPokemon);
+    
+//     // showAbilities(currentBigPokemon);
+//     insertDetails(calculatedHeight, calculatedWeight);
+// }
+
+
+
+// function calculateWeight(currentBigPokemon){
+//     return `${currentBigPokemon['weight']}/10`;
+// }
+
+ 
+// function calculateHeight(currentBigPokemon){
+//     return `${currentBigPokemon['height']}`;
+// }
+
+//  function insertDetails(calculatedHeight, calculatedWeight){
+//     const heightElement = document.getElementById('height');
+//     if (heightElement){heightElement.innerText = 'is' + calculatedHeight;}
+//     const weightElement = document.getElementById('weight');
+//     if (weightElement) weightElement.innerText = calculatedWeight;
+// }
+
+//USAGE
+// calculateDetails(currentBigPokemon); 
+///////////////////////////////////////////// Base Stats /////////////////////////////////////////////
+
+function getBaseStats(currentBigPokemon){
+    
+ statsJSONarray = currentBigPokemon['stats'];
+let baseStats = [];
+
+if (Array.isArray(statsJSONarray)) {
+    for (let s = 0; s < statsJSONarray.length; s++) {
+        let singleStatFromArray = statsJSONarray[s];
+        baseStats.push(singleStatFromArray);
+        console.log('baseStats gepushte sind: ', baseStats);
+    }
+} else {
+    console.error("Stats data is not an array.");
+}
+
+
+
+alert(Array.isArray(statsJSONarray));
+}
+ 
+
+
+
+
+///////////////////////////////////////////// Evolution /////////////////////////////////////////////
+
+
+///////////////////////////////////////////// Moves /////////////////////////////////////////////
+
+
+
+
+
+
+///////////////////////////////////////////// General BigCard /////////////////////////////////////////////
+
+function showTab(tabName) {
+    let selectedTabPage = document.getElementById(tabName);
+    const allTabs = document.querySelectorAll('.singleDetail');
+    allTabs.forEach(tab => tab.classList.add('d-none-tabs'));
+    selectedTabPage.classList.remove('d-none-tabs');
+}
+
+function styleBigCard(currentBigPokemon){
     let bigCardUpperHalf = document.getElementById('pokedex');
-    colorElement(bigCardUpperHalf, currentSinglePokemon['types'][0]['type']['name']);
+    colorElement(bigCardUpperHalf, currentBigPokemon['types'][0]['type']['name']);
 
     typeContainerSingle.classList.add('typeContainer');
-    typeContainerSingle.style.backgroundColor = getDarkerTypeColor(currentSinglePokemon['types'][0]['type']['name']);
+    typeContainerSingle.style.backgroundColor = getDarkerTypeColor(currentBigPokemon['types'][0]['type']['name']);
 
-    if (currentSinglePokemon['types'].length > 1) {
-        let type2ContainerSingle = document.getElementById(`typeContainer2Single${currentSinglePokemon['name']}`);
+    if (currentBigPokemon['types'].length > 1) {
+        let type2ContainerSingle = document.getElementById(`typeContainer2Single${currentBigPokemon['name']}`);
         type2ContainerSingle.classList.add('typeContainer');
-        type2ContainerSingle.style.backgroundColor = getDarkerTypeColor(currentSinglePokemon['types'][0]['type']['name']);
+        type2ContainerSingle.style.backgroundColor = getDarkerTypeColor(currentBigPokemon['types'][0]['type']['name']);
     }
-
 }
 
 function colorElement(cardElement, type) {
